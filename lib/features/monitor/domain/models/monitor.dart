@@ -44,7 +44,8 @@ class Monitor with _$Monitor {
     return Monitor.fromJson({
       'id': doc.id,
       ...data,
-      'lastSeenAt': (data['lastSeenAt'] as Timestamp).toDate().toIso8601String(),
+      'lastSeenAt':
+          (data['lastSeenAt'] as Timestamp).toDate().toIso8601String(),
       'createdAt': data['createdAt'] != null
           ? (data['createdAt'] as Timestamp).toDate().toIso8601String()
           : null,

@@ -23,8 +23,7 @@ final recentSightingsProvider = StreamProvider<List<MonitorSighting>>((ref) {
 });
 
 // ─── Park monitor counts (for map) ───
-final parkMonitorCountsProvider =
-    FutureProvider<Map<String, int>>((ref) async {
+final parkMonitorCountsProvider = FutureProvider<Map<String, int>>((ref) async {
   final repo = ref.watch(monitorRepositoryProvider);
   return repo.getParkMonitorCounts();
 });

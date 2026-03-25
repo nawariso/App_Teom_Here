@@ -97,7 +97,8 @@ class _AchievementTile extends StatelessWidget {
           Text(
             data.title,
             style: TextStyle(
-              color: data.unlocked ? AppColors.textPrimary : AppColors.textMuted,
+              color:
+                  data.unlocked ? AppColors.textPrimary : AppColors.textMuted,
               fontSize: 11,
               fontWeight: FontWeight.w600,
               fontFamily: 'Fredoka',
@@ -118,7 +119,8 @@ class _AchievementTile extends StatelessWidget {
           ),
           if (data.unlocked) ...[
             const SizedBox(height: 4),
-            const Text('✓', style: TextStyle(color: AppColors.primary, fontSize: 11)),
+            const Text('✓',
+                style: TextStyle(color: AppColors.primary, fontSize: 11)),
           ],
         ],
       ),
