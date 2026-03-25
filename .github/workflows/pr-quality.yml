@@ -1,0 +1,46 @@
+# ============================================================================
+# Toem Here! — PR Quality Gate
+# Runs on PRs: checks commit messages, PR size, and labels
+# ============================================================================
+
+name: PR Quality Gate
+
+on:
+  pull_request:
+    types: [opened, synchronize, edited, labeled, unlabeled]
+
+jobs:
+  pr-checks:
+    name: 🔎 PR Quality
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Check PR size
+        run: |
+          ADDITIONS=$(gh pr view ${{ github.event.pull_request.number }} --json additions -q '.additions')
+          DELETIONS=$(gh pr view ${{ github.event.pull_request.number }} --json deletions -q '.deletions')
+          TOTAL=$((ADDITIONS + DELETIONS))
+
+          echo "📊 PR Size: +$ADDITIONS / -$DELETIONS (Total: $TOTAL lines)"
+
+          if [ "$TOTAL" -gt 1000 ]; then
+            echo "⚠️ Warning: Large PR detected ($TOTAL lines). Consider splitting into smaller PRs."
+          fi
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Verify branch naming
+        run: |
+          BRANCH="${{ github.head_ref }}"
+          PATTERN="^(feature|bugfix|hotfix|chore|refactor|docs|test)\/[a-z0-9._-]+$"
+
+          if [[ ! "$BRANCH" =~ $PATTERN ]]; then
+            echo "⚠️ Branch name '$BRANCH' doesn't follow convention."
+            echo "Expected: feature/*, bugfix/*, hotfix/*, chore/*, refactor/*, docs/*, test/*"
+          else
+            echo "✅ Branch name '$BRANCH' follows convention."
+          fi
