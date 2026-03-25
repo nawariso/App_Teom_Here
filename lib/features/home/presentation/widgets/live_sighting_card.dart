@@ -14,9 +14,8 @@ class LiveSightingCard extends ConsumerWidget {
       data: (sightings) {
         if (sightings.isEmpty) return const SizedBox.shrink();
         final latest = sightings.first;
-        final minutesAgo = DateTime.now()
-            .difference(latest.spottedAt)
-            .inMinutes;
+        final minutesAgo =
+            DateTime.now().difference(latest.spottedAt).inMinutes;
         final timeLabel = minutesAgo < 1
             ? 'Just now'
             : minutesAgo < 60

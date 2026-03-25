@@ -205,8 +205,8 @@ class _StatCard extends StatelessWidget {
                     fontSize: 14,
                     fontWeight: FontWeight.w700)),
             Text(label,
-                style: const TextStyle(
-                    color: AppColors.textMuted, fontSize: 10)),
+                style:
+                    const TextStyle(color: AppColors.textMuted, fontSize: 10)),
           ],
         ),
       ),

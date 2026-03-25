@@ -86,12 +86,16 @@ class _CollectionItem extends StatelessWidget {
                 ? CachedNetworkImage(
                     imageUrl: monitor.photoUrl!,
                     fit: BoxFit.cover,
-                    placeholder: (_, __) =>
-                        Center(child: Text(monitor.badge, style: const TextStyle(fontSize: 28))),
-                    errorWidget: (_, __, ___) =>
-                        Center(child: Text(monitor.badge, style: const TextStyle(fontSize: 28))),
+                    placeholder: (_, __) => Center(
+                        child: Text(monitor.badge,
+                            style: const TextStyle(fontSize: 28))),
+                    errorWidget: (_, __, ___) => Center(
+                        child: Text(monitor.badge,
+                            style: const TextStyle(fontSize: 28))),
                   )
-                : Center(child: Text(monitor.badge, style: const TextStyle(fontSize: 28))),
+                : Center(
+                    child: Text(monitor.badge,
+                        style: const TextStyle(fontSize: 28))),
           ),
         ),
         const SizedBox(height: 6),
