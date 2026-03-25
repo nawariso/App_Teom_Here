@@ -87,8 +87,8 @@ class MonitorRepository {
       'sightingStreak': 1,
       'lastSeenAt': FieldValue.serverTimestamp(),
       'lastSeenBy': userId,
-      'photoGallery': [photoUrl],
-      'tags': [],
+      'photoGallery': <String>[photoUrl],
+      'tags': <String>[],
       'createdAt': FieldValue.serverTimestamp(),
     });
 

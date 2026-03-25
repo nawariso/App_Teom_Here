@@ -22,8 +22,8 @@ void main() {
         'sightingStreak': 12,
         'lastSeenAt': '2026-03-25T10:00:00.000Z',
         'lastSeenBy': 'user-123',
-        'photoGallery': [],
-        'tags': [],
+        'photoGallery': <String>[],
+        'tags': <String>[],
       };
 
       final monitor = Monitor.fromJson(json);
