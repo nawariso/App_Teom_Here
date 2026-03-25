@@ -41,6 +41,11 @@ jobs:
       - name: Install dependencies
         run: flutter pub get
 
+      - name: Create firebase_options.dart
+        env:
+          FIREBASE_OPTIONS: ${{ secrets.FIREBASE_OPTIONS }}
+        run: echo "$FIREBASE_OPTIONS" > lib/firebase_options.dart
+
       - name: Run code generation
         run: dart run build_runner build --delete-conflicting-outputs
 
@@ -73,6 +78,11 @@ jobs:
 
       - name: Install dependencies
         run: flutter pub get
+
+      - name: Create firebase_options.dart
+        env:
+          FIREBASE_OPTIONS: ${{ secrets.FIREBASE_OPTIONS }}
+        run: echo "$FIREBASE_OPTIONS" > lib/firebase_options.dart
 
       - name: Run code generation
         run: dart run build_runner build --delete-conflicting-outputs
@@ -114,6 +124,11 @@ jobs:
 
       - name: Install dependencies
         run: flutter pub get
+
+      - name: Create firebase_options.dart
+        env:
+          FIREBASE_OPTIONS: ${{ secrets.FIREBASE_OPTIONS }}
+        run: echo "$FIREBASE_OPTIONS" > lib/firebase_options.dart
 
       - name: Run code generation
         run: dart run build_runner build --delete-conflicting-outputs
@@ -174,6 +189,11 @@ jobs:
 
       - name: Install dependencies
         run: flutter pub get
+
+      - name: Create firebase_options.dart
+        env:
+          FIREBASE_OPTIONS: ${{ secrets.FIREBASE_OPTIONS }}
+        run: echo "$FIREBASE_OPTIONS" > lib/firebase_options.dart
 
       - name: Run code generation
         run: dart run build_runner build --delete-conflicting-outputs
