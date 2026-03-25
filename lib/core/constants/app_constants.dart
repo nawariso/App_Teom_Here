@@ -11,7 +11,7 @@ class AppConstants {
   static const usersCollection = 'users';
 
   // Rarity thresholds (based on sighting frequency)
-  static const legendaryThreshold = 5;  // spotted < 5 times
+  static const legendaryThreshold = 5; // spotted < 5 times
   static const epicThreshold = 15;
   static const rareThreshold = 30;
   // common = spotted > 30 times
@@ -25,16 +25,16 @@ class AppConstants {
 
   // Level thresholds
   static const levelThresholds = [
-    0,      // Level 1
-    100,    // Level 2
-    300,    // Level 3
-    600,    // Level 4
-    1000,   // Level 5
-    1500,   // Level 6
-    2500,   // Level 7
-    4000,   // Level 8
-    6000,   // Level 9
-    10000,  // Level 10
+    0, // Level 1
+    100, // Level 2
+    300, // Level 3
+    600, // Level 4
+    1000, // Level 5
+    1500, // Level 6
+    2500, // Level 7
+    4000, // Level 8
+    6000, // Level 9
+    10000, // Level 10
   ];
 
   // Bangkok park coordinates

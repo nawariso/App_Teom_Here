@@ -76,7 +76,8 @@ class RankingPreviewCard extends StatelessWidget {
                       errorWidget: (_, __, ___) => _PhotoPlaceholder(
                           badge: monitor.badge, color: _rarityColor),
                     )
-                  : _PhotoPlaceholder(badge: monitor.badge, color: _rarityColor),
+                  : _PhotoPlaceholder(
+                      badge: monitor.badge, color: _rarityColor),
             ),
             const SizedBox(width: 12),
             // Info
@@ -129,7 +130,8 @@ class RankingPreviewCard extends StatelessWidget {
             Column(
               crossAxisAlignment: CrossAxisAlignment.end,
               children: [
-                const Text('♥', style: TextStyle(color: AppColors.heart, fontSize: 14)),
+                const Text('♥',
+                    style: TextStyle(color: AppColors.heart, fontSize: 14)),
                 Text(
                   '${monitor.votes}',
                   style: const TextStyle(

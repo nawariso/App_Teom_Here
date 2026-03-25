@@ -27,22 +27,16 @@ class MonitorRepository {
 
   // ─── Fetch all monitors sorted by votes ───
   Stream<List<Monitor>> watchMonitorsByVotes() {
-    return _monitorsRef
-        .orderBy('votes', descending: true)
-        .snapshots()
-        .map((snapshot) => snapshot.docs
-            .map((doc) => Monitor.fromFirestore(doc))
-            .toList());
+    return _monitorsRef.orderBy('votes', descending: true).snapshots().map(
+        (snapshot) =>
+            snapshot.docs.map((doc) => Monitor.fromFirestore(doc)).toList());
   }
 
   // ─── Fetch monitors by park ───
   Stream<List<Monitor>> watchMonitorsByPark(String parkName) {
-    return _monitorsRef
-        .where('parkName', isEqualTo: parkName)
-        .snapshots()
-        .map((snapshot) => snapshot.docs
-            .map((doc) => Monitor.fromFirestore(doc))
-            .toList());
+    return _monitorsRef.where('parkName', isEqualTo: parkName).snapshots().map(
+        (snapshot) =>
+            snapshot.docs.map((doc) => Monitor.fromFirestore(doc)).toList());
   }
 
   // ─── Get single monitor ───
@@ -103,10 +97,8 @@ class MonitorRepository {
 
   // ─── Vote for a monitor ───
   Future<void> vote(String monitorId, String userId) async {
-    final voteRef = _monitorsRef
-        .doc(monitorId)
-        .collection('voters')
-        .doc(userId);
+    final voteRef =
+        _monitorsRef.doc(monitorId).collection('voters').doc(userId);
 
     final voteDoc = await voteRef.get();
 

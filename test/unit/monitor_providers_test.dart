@@ -70,8 +70,7 @@ void main() {
     });
 
     test('emits empty list when no monitors', () async {
-      when(mockRepo.watchMonitorsByVotes())
-          .thenAnswer((_) => Stream.value([]));
+      when(mockRepo.watchMonitorsByVotes()).thenAnswer((_) => Stream.value([]));
 
       final container = makeContainer();
       addTearDown(container.dispose);
@@ -85,26 +84,26 @@ void main() {
   group('monitorDetailProvider', () {
     test('returns monitor when found', () async {
       final monitor = _makeMonitor(id: 'monitor-1');
-      when(mockRepo.getMonitor('monitor-1'))
-          .thenAnswer((_) async => monitor);
+      when(mockRepo.getMonitor('monitor-1')).thenAnswer((_) async => monitor);
 
       final container = makeContainer();
       addTearDown(container.dispose);
 
-      final result = await container.read(monitorDetailProvider('monitor-1').future);
+      final result =
+          await container.read(monitorDetailProvider('monitor-1').future);
 
       expect(result, isNotNull);
       expect(result!.id, 'monitor-1');
     });
 
     test('returns null when monitor not found', () async {
-      when(mockRepo.getMonitor('unknown'))
-          .thenAnswer((_) async => null);
+      when(mockRepo.getMonitor('unknown')).thenAnswer((_) async => null);
 
       final container = makeContainer();
       addTearDown(container.dispose);
 
-      final result = await container.read(monitorDetailProvider('unknown').future);
+      final result =
+          await container.read(monitorDetailProvider('unknown').future);
 
       expect(result, isNull);
     });
@@ -169,7 +168,8 @@ void main() {
       final container = makeContainer();
       addTearDown(container.dispose);
 
-      container.read(rankingFilterProvider.notifier).state = RankingFilter.weekly;
+      container.read(rankingFilterProvider.notifier).state =
+          RankingFilter.weekly;
 
       expect(container.read(rankingFilterProvider), RankingFilter.weekly);
     });
