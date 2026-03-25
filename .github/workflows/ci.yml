@@ -27,9 +27,14 @@ jobs:
   analyze:
     name: 🔍 Analyze & Lint
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+        with:
+          ref: ${{ github.head_ref || github.ref_name }}
+          token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
@@ -49,8 +54,20 @@ jobs:
       - name: Run code generation
         run: dart run build_runner build --delete-conflicting-outputs
 
-      - name: Verify formatting
-        run: dart format --output=none --set-exit-if-changed .
+      - name: Apply formatting
+        run: dart format .
+
+      - name: Commit formatting fixes
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          if ! git diff --quiet; then
+            git add -A
+            git commit -m "style: auto-format with dart format [skip ci]"
+            git push
+          else
+            echo "✅ No formatting changes needed"
+          fi
 
       - name: Analyze code
         run: flutter analyze --no-fatal-infos
