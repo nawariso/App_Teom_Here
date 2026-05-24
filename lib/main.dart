@@ -18,7 +18,7 @@ void main() async {
 
   // Set system UI overlay style
   SystemChrome.setSystemUIOverlayStyle(
-    const SystemUIOverlayStyle(
+    const SystemUiOverlayStyle(
       statusBarColor: Colors.transparent,
       statusBarIconBrightness: Brightness.light,
       systemNavigationBarColor: Color(0xFF0A0A0A),
@@ -26,10 +26,15 @@ void main() async {
     ),
   );
 
-  // Initialize Firebase
-  await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform,
-  );
+  // Initialize Firebase when config exists. Local web demo mode can still render
+  // without Firebase while setup is incomplete.
+  try {
+    await Firebase.initializeApp(
+      options: DefaultFirebaseOptions.currentPlatform,
+    );
+  } on Object catch (error) {
+    debugPrint('Firebase initialization skipped: $error');
+  }
 
   // Initialize Hive for local storage
   await Hive.initFlutter();

@@ -1,7 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../data/monitor_repository.dart';
-import '../domain/models/monitor.dart';
+import '../../data/monitor_repository.dart';
+import '../../domain/models/monitor.dart';
 
 // ─── Monitors ranked by votes ───
 final monitorsRankedProvider = StreamProvider<List<Monitor>>((ref) {

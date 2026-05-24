@@ -79,6 +79,7 @@ build/
 # Coverage
 coverage/
 *.lcov
+flutter_run*.log
 
 # Secrets & Environment
 .env
