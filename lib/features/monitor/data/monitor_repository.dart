@@ -1,11 +1,19 @@
+import 'dart:convert';
 import 'dart:io';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_storage/firebase_storage.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../domain/models/monitor.dart';
 
 final monitorRepositoryProvider = Provider<MonitorRepository>((ref) {
+  if (Firebase.apps.isEmpty) {
+    return MonitorRepository.demo(assetBundle: rootBundle);
+  }
+
   return MonitorRepository(
     firestore: FirebaseFirestore.instance,
     storage: FirebaseStorage.instance,
@@ -13,40 +21,70 @@ final monitorRepositoryProvider = Provider<MonitorRepository>((ref) {
 });
 
 class MonitorRepository {
-  final FirebaseFirestore _firestore;
-  final FirebaseStorage _storage;
+  final FirebaseFirestore? _firestore;
+  final FirebaseStorage? _storage;
+  final AssetBundle? _assetBundle;
 
   MonitorRepository({
     required FirebaseFirestore firestore,
     required FirebaseStorage storage,
   })  : _firestore = firestore,
-        _storage = storage;
+        _storage = storage,
+        _assetBundle = null;
 
-  CollectionReference get _monitorsRef => _firestore.collection('monitors');
-  CollectionReference get _sightingsRef => _firestore.collection('sightings');
+  MonitorRepository.demo({
+    required AssetBundle assetBundle,
+  })  : _firestore = null,
+        _storage = null,
+        _assetBundle = assetBundle;
 
-  // ─── Fetch all monitors sorted by votes ───
+  bool get _isDemo => _assetBundle != null;
+
+  CollectionReference get _monitorsRef => _firestore!.collection('monitors');
+  CollectionReference get _sightingsRef => _firestore!.collection('sightings');
+
   Stream<List<Monitor>> watchMonitorsByVotes() {
+    if (_isDemo) {
+      return Stream.fromFuture(_loadDemoMonitors()).map((monitors) {
+        return [...monitors]..sort((a, b) => b.votes.compareTo(a.votes));
+      });
+    }
+
     return _monitorsRef.orderBy('votes', descending: true).snapshots().map(
-        (snapshot) =>
-            snapshot.docs.map((doc) => Monitor.fromFirestore(doc)).toList());
+          (snapshot) =>
+              snapshot.docs.map((doc) => Monitor.fromFirestore(doc)).toList(),
+        );
   }
 
-  // ─── Fetch monitors by park ───
   Stream<List<Monitor>> watchMonitorsByPark(String parkName) {
+    if (_isDemo) {
+      return Stream.fromFuture(_loadDemoMonitors()).map((monitors) {
+        return monitors
+            .where((monitor) => monitor.parkName == parkName)
+            .toList();
+      });
+    }
+
     return _monitorsRef.where('parkName', isEqualTo: parkName).snapshots().map(
-        (snapshot) =>
-            snapshot.docs.map((doc) => Monitor.fromFirestore(doc)).toList());
+          (snapshot) =>
+              snapshot.docs.map((doc) => Monitor.fromFirestore(doc)).toList(),
+        );
   }
 
-  // ─── Get single monitor ───
   Future<Monitor?> getMonitor(String id) async {
+    if (_isDemo) {
+      final monitors = await _loadDemoMonitors();
+      for (final monitor in monitors) {
+        if (monitor.id == id) return monitor;
+      }
+      return null;
+    }
+
     final doc = await _monitorsRef.doc(id).get();
     if (!doc.exists) return null;
     return Monitor.fromFirestore(doc);
   }
 
-  // ─── Create new monitor ───
   Future<String> createMonitor({
     required String name,
     required String nickname,
@@ -61,15 +99,17 @@ class MonitorRepository {
     required String userId,
     MonitorRarity rarity = MonitorRarity.common,
   }) async {
-    // Upload photo
-    final photoRef = _storage
+    if (_isDemo) {
+      throw UnsupportedError('Creating monitors requires Firebase setup.');
+    }
+
+    final photoRef = _storage!
         .ref()
         .child('monitors')
         .child('${DateTime.now().millisecondsSinceEpoch}.jpg');
     await photoRef.putFile(photo);
     final photoUrl = await photoRef.getDownloadURL();
 
-    // Create document
     final docRef = await _monitorsRef.add({
       'name': name,
       'nickname': nickname,
@@ -88,29 +128,30 @@ class MonitorRepository {
       'lastSeenAt': FieldValue.serverTimestamp(),
       'lastSeenBy': userId,
       'photoGallery': [photoUrl],
-      'tags': [],
+      'tags': <String>[],
       'createdAt': FieldValue.serverTimestamp(),
     });
 
     return docRef.id;
   }
 
-  // ─── Vote for a monitor ───
   Future<void> vote(String monitorId, String userId) async {
+    if (_isDemo) {
+      return;
+    }
+
     final voteRef =
         _monitorsRef.doc(monitorId).collection('voters').doc(userId);
 
     final voteDoc = await voteRef.get();
 
-    await _firestore.runTransaction((transaction) async {
+    await _firestore!.runTransaction((transaction) async {
       if (voteDoc.exists) {
-        // Remove vote
         transaction.delete(voteRef);
         transaction.update(_monitorsRef.doc(monitorId), {
           'votes': FieldValue.increment(-1),
         });
       } else {
-        // Add vote
         transaction.set(voteRef, {
           'votedAt': FieldValue.serverTimestamp(),
         });
@@ -121,8 +162,11 @@ class MonitorRepository {
     });
   }
 
-  // ─── Check if user voted ───
   Future<bool> hasVoted(String monitorId, String userId) async {
+    if (_isDemo) {
+      return false;
+    }
+
     final doc = await _monitorsRef
         .doc(monitorId)
         .collection('voters')
@@ -131,7 +175,6 @@ class MonitorRepository {
     return doc.exists;
   }
 
-  // ─── Report sighting ───
   Future<void> reportSighting({
     required String monitorId,
     required String userId,
@@ -141,7 +184,11 @@ class MonitorRepository {
     required String parkName,
     String? notes,
   }) async {
-    final photoRef = _storage
+    if (_isDemo) {
+      throw UnsupportedError('Reporting sightings requires Firebase setup.');
+    }
+
+    final photoRef = _storage!
         .ref()
         .child('sightings')
         .child('${DateTime.now().millisecondsSinceEpoch}.jpg');
@@ -159,7 +206,6 @@ class MonitorRepository {
       'spottedAt': FieldValue.serverTimestamp(),
     });
 
-    // Update monitor's last seen
     await _monitorsRef.doc(monitorId).update({
       'lastSeenAt': FieldValue.serverTimestamp(),
       'lastSeenBy': userId,
@@ -169,25 +215,43 @@ class MonitorRepository {
     });
   }
 
-  // ─── Get recent sightings ───
   Stream<List<MonitorSighting>> watchRecentSightings({int limit = 20}) {
+    if (_isDemo) {
+      return Stream.fromFuture(_loadDemoSightings()).map((sightings) {
+        return ([...sightings]
+              ..sort((a, b) => b.spottedAt.compareTo(a.spottedAt)))
+            .take(limit)
+            .toList();
+      });
+    }
+
     return _sightingsRef
         .orderBy('spottedAt', descending: true)
         .limit(limit)
         .snapshots()
-        .map((snapshot) => snapshot.docs.map((doc) {
-              final data = doc.data() as Map<String, dynamic>;
-              return MonitorSighting.fromJson({
-                'id': doc.id,
-                ...data,
-                'spottedAt':
-                    (data['spottedAt'] as Timestamp).toDate().toIso8601String(),
-              });
-            }).toList());
+        .map(
+          (snapshot) => snapshot.docs.map((doc) {
+            final data = doc.data() as Map<String, dynamic>;
+            return MonitorSighting.fromJson({
+              'id': doc.id,
+              ...data,
+              'spottedAt':
+                  (data['spottedAt'] as Timestamp).toDate().toIso8601String(),
+            });
+          }).toList(),
+        );
   }
 
-  // ─── Park statistics ───
   Future<Map<String, int>> getParkMonitorCounts() async {
+    if (_isDemo) {
+      final monitors = await _loadDemoMonitors();
+      final counts = <String, int>{};
+      for (final monitor in monitors) {
+        counts[monitor.parkName] = (counts[monitor.parkName] ?? 0) + 1;
+      }
+      return counts;
+    }
+
     final snapshot = await _monitorsRef.get();
     final counts = <String, int>{};
     for (final doc in snapshot.docs) {
@@ -197,16 +261,32 @@ class MonitorRepository {
     return counts;
   }
 
+  Future<List<Monitor>> _loadDemoMonitors() async {
+    final records = await _loadDemoRecords('assets/data/demo_monitors.json');
+    return records.map(Monitor.fromJson).toList();
+  }
+
+  Future<List<MonitorSighting>> _loadDemoSightings() async {
+    final records = await _loadDemoRecords('assets/data/demo_sightings.json');
+    return records.map(MonitorSighting.fromJson).toList();
+  }
+
+  Future<List<Map<String, dynamic>>> _loadDemoRecords(String path) async {
+    final rawJson = await _assetBundle!.loadString(path);
+    final decoded = jsonDecode(rawJson) as List<dynamic>;
+    return decoded.cast<Map<String, dynamic>>();
+  }
+
   String _getBadgeForRarity(MonitorRarity rarity) {
     switch (rarity) {
       case MonitorRarity.common:
-        return '🦎';
+        return 'C';
       case MonitorRarity.rare:
-        return '🌟';
+        return 'R';
       case MonitorRarity.epic:
-        return '💪';
+        return 'E';
       case MonitorRarity.legendary:
-        return '👑';
+        return 'L';
     }
   }
 }

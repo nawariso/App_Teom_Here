@@ -29,7 +29,7 @@ class HomeScreen extends ConsumerWidget {
               title: Row(
                 children: [
                   Text(
-                    'Toem Here! 🦎',
+                    'Toem Here!',
                     style: Theme.of(context).textTheme.displayMedium?.copyWith(
                           color: AppColors.primary,
                           fontSize: 22,
@@ -70,13 +70,13 @@ class HomeScreen extends ConsumerWidget {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    '🏆 Cuteness Ranking',
+                    'Cuteness Ranking',
                     style: Theme.of(context).textTheme.headlineMedium,
                   ),
                   GestureDetector(
                     onTap: () => context.go('/ranking'),
                     child: Text(
-                      'ดูทั้งหมด →',
+                      'View all',
                       style: Theme.of(context).textTheme.labelLarge,
                     ),
                   ),
@@ -121,12 +121,12 @@ class HomeScreen extends ConsumerWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    '🎯 My Collection',
+                    'My Collection',
                     style: Theme.of(context).textTheme.headlineMedium,
                   ),
                   const SizedBox(height: 4),
                   Text(
-                    '3/50 ตัวที่พบเจอ',
+                    '3 of 50 discovered',
                     style: Theme.of(context).textTheme.labelSmall,
                   ),
                 ],
@@ -142,7 +142,7 @@ class HomeScreen extends ConsumerWidget {
             child: Padding(
               padding: const EdgeInsets.fromLTRB(20, 24, 20, 8),
               child: Text(
-                '🏅 Achievements',
+                'Achievements',
                 style: Theme.of(context).textTheme.headlineMedium,
               ),
             ),

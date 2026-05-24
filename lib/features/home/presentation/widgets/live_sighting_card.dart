@@ -42,7 +42,7 @@ class LiveSightingCard extends ConsumerWidget {
               const SizedBox(width: 10),
               Expanded(
                 child: Text(
-                  '🦎 Spotted at ${latest.parkName}',
+                  'Latest sighting at ${latest.parkName}',
                   style: const TextStyle(
                     color: AppColors.primary,
                     fontSize: 13,
