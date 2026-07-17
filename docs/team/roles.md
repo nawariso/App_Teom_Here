@@ -2,6 +2,15 @@
 
 This project uses role-based ownership to keep decisions clear without slowing down development.
 
+Detailed agent prompts, routing rules, and handoff templates now live under `docs/agents/`.
+
+Start here:
+
+- Agent workspace: `docs/agents/README.md`
+- Operating model: `docs/agents/operating-model.md`
+- Agent roster: `docs/agents/agent-roster.md`
+- Task routing: `docs/agents/task-routing.md`
+
 ## PM
 
 Owns product direction, milestones, priority, and release scope.
@@ -29,6 +38,15 @@ Owns technical architecture and system boundaries.
 - Reviews data model, security rules, and dependency choices.
 - Keeps architecture aligned with the MVP and future growth.
 
+## EA
+
+Owns long-term platform direction, integration boundaries, governance, and non-functional requirements.
+
+- Reviews architecture decisions that affect future scale.
+- Defines platform and integration boundaries.
+- Keeps technology choices aligned with product direction.
+- Avoids blocking MVP delivery with speculative architecture.
+
 ## Dev
 
 Owns implementation.
@@ -47,6 +65,15 @@ Owns data model, ranking rules, analytics, and seed data.
 - Plans analytics events.
 - Creates safe demo or seed data for development.
 
+## DBA
+
+Owns Firestore schema, indexes, query access paths, data integrity, and security-rule data implications.
+
+- Reviews Firestore collections and document structure.
+- Defines required indexes for MVP queries.
+- Reviews migration and backfill needs.
+- Coordinates security-rule implications with Security and Infra.
+
 ## Infra
 
 Owns developer setup, Firebase setup, CI/CD, secrets, and release pipeline.
@@ -55,6 +82,24 @@ Owns developer setup, Firebase setup, CI/CD, secrets, and release pipeline.
 - Maintains GitHub Actions.
 - Documents Firebase, Google Maps, signing, and deployment setup.
 - Keeps environment configuration reproducible.
+
+## DevOps
+
+Owns CI/CD, quality gates, release automation, branch workflow, and build reliability.
+
+- Maintains GitHub Actions.
+- Keeps CI aligned with local verification commands.
+- Diagnoses pipeline failures.
+- Documents release workflow.
+
+## Security And Privacy
+
+Owns user safety, location privacy, secret handling, and backend access risk.
+
+- Reviews Firestore rules and sensitive access paths.
+- Protects location and photo data.
+- Ensures real secrets are never committed.
+- Defines required mitigations for abuse and privacy risks.
 
 ## QA
 
@@ -82,4 +127,4 @@ Use subagents only for clear parallel work.
 - Worker agents: isolated implementation tasks with clear file ownership.
 - Lead agent: final integration, consistency checks, and release notes.
 
-For now, the project should use these documents as the source of truth. Custom Codex skills can be added later if the same workflow repeats often enough to justify them.
+Use `docs/agents/templates/agent-task.md` to assign work and `docs/agents/templates/handoff.md` for final output.

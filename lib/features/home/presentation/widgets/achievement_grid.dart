@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+
 import '../../../../core/constants/app_constants.dart';
 import '../../../../core/theme/app_theme.dart';
 
@@ -7,39 +8,39 @@ class AchievementGrid extends StatelessWidget {
 
   static const _achievements = [
     _AchievementData(
-      icon: '🦎',
+      icon: Icons.pets_rounded,
       title: 'First Spot',
-      descriptionTh: 'พบวารานัสตัวแรก',
+      description: 'Log your first sighting',
       unlocked: true,
     ),
     _AchievementData(
-      icon: '🗺️',
+      icon: Icons.map_rounded,
       title: 'Park Explorer',
-      descriptionTh: 'เยี่ยมชม 3 สวน',
+      description: 'Visit 3 parks',
       unlocked: false,
     ),
     _AchievementData(
-      icon: '♥',
+      icon: Icons.favorite_rounded,
       title: 'Fan Club',
-      descriptionTh: 'โหวต ${AppConstants.xpPerVote * 10} ครั้ง',
+      description: 'Vote ${AppConstants.xpPerVote * 10} times',
       unlocked: false,
     ),
     _AchievementData(
-      icon: '📸',
+      icon: Icons.photo_camera_rounded,
       title: 'Paparazzi',
-      descriptionTh: 'ถ่ายภาพ 10 ใบ',
+      description: 'Submit 10 photos',
       unlocked: false,
     ),
     _AchievementData(
-      icon: '👑',
+      icon: Icons.workspace_premium_rounded,
       title: 'Legend Hunter',
-      descriptionTh: 'พบ Legendary 1 ตัว',
+      description: 'Find a legendary monitor',
       unlocked: false,
     ),
     _AchievementData(
-      icon: '🔥',
+      icon: Icons.local_fire_department_rounded,
       title: 'On a Streak',
-      descriptionTh: 'พบ 7 วันติดต่อกัน',
+      description: 'Spot monitors 7 days in a row',
       unlocked: false,
     ),
   ];
@@ -64,9 +65,9 @@ class AchievementGrid extends StatelessWidget {
 }
 
 class _AchievementTile extends StatelessWidget {
-  final _AchievementData data;
-
   const _AchievementTile({required this.data});
+
+  final _AchievementData data;
 
   @override
   Widget build(BuildContext context) {
@@ -74,24 +75,22 @@ class _AchievementTile extends StatelessWidget {
       padding: const EdgeInsets.all(10),
       decoration: BoxDecoration(
         color: data.unlocked
-            ? AppColors.primary.withOpacity(0.1)
+            ? AppColors.primary.withValues(alpha: 0.1)
             : AppColors.bgCard,
         borderRadius: BorderRadius.circular(14),
         border: Border.all(
           color: data.unlocked
-              ? AppColors.primary.withOpacity(0.3)
-              : Colors.white.withOpacity(0.06),
+              ? AppColors.primary.withValues(alpha: 0.3)
+              : Colors.white.withValues(alpha: 0.06),
         ),
       ),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Text(
+          Icon(
             data.icon,
-            style: TextStyle(
-              fontSize: 28,
-              color: data.unlocked ? null : const Color(0xFF444444),
-            ),
+            size: 28,
+            color: data.unlocked ? AppColors.primary : const Color(0xFF444444),
           ),
           const SizedBox(height: 6),
           Text(
@@ -107,11 +106,11 @@ class _AchievementTile extends StatelessWidget {
           ),
           const SizedBox(height: 2),
           Text(
-            data.descriptionTh,
+            data.description,
             style: const TextStyle(
               color: AppColors.textMuted,
               fontSize: 9,
-              fontFamily: 'NotoSansThai',
+              fontFamily: 'Fredoka',
             ),
             textAlign: TextAlign.center,
             maxLines: 2,
@@ -119,8 +118,11 @@ class _AchievementTile extends StatelessWidget {
           ),
           if (data.unlocked) ...[
             const SizedBox(height: 4),
-            const Text('✓',
-                style: TextStyle(color: AppColors.primary, fontSize: 11)),
+            const Icon(
+              Icons.check_circle_rounded,
+              color: AppColors.primary,
+              size: 13,
+            ),
           ],
         ],
       ),
@@ -129,15 +131,15 @@ class _AchievementTile extends StatelessWidget {
 }
 
 class _AchievementData {
-  final String icon;
-  final String title;
-  final String descriptionTh;
-  final bool unlocked;
-
   const _AchievementData({
     required this.icon,
     required this.title,
-    required this.descriptionTh,
+    required this.description,
     required this.unlocked,
   });
+
+  final IconData icon;
+  final String title;
+  final String description;
+  final bool unlocked;
 }

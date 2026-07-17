@@ -63,10 +63,9 @@ class CollectionCarousel extends ConsumerWidget {
 }
 
 class _CollectionItem extends StatelessWidget {
+  const _CollectionItem({required this.monitor, required this.rarityColor});
   final Monitor monitor;
   final Color rarityColor;
-
-  const _CollectionItem({required this.monitor, required this.rarityColor});
 
   @override
   Widget build(BuildContext context) {
@@ -77,8 +76,11 @@ class _CollectionItem extends StatelessWidget {
           height: 72,
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(14),
-            border: Border.all(color: rarityColor.withOpacity(0.4), width: 1.5),
-            color: rarityColor.withOpacity(0.08),
+            border: Border.all(
+              color: rarityColor.withValues(alpha: 0.4),
+              width: 1.5,
+            ),
+            color: rarityColor.withValues(alpha: 0.08),
           ),
           child: ClipRRect(
             borderRadius: BorderRadius.circular(12),
@@ -87,15 +89,24 @@ class _CollectionItem extends StatelessWidget {
                     imageUrl: monitor.photoUrl!,
                     fit: BoxFit.cover,
                     placeholder: (_, __) => Center(
-                        child: Text(monitor.badge,
-                            style: const TextStyle(fontSize: 28))),
+                      child: Text(
+                        monitor.badge,
+                        style: const TextStyle(fontSize: 28),
+                      ),
+                    ),
                     errorWidget: (_, __, ___) => Center(
-                        child: Text(monitor.badge,
-                            style: const TextStyle(fontSize: 28))),
+                      child: Text(
+                        monitor.badge,
+                        style: const TextStyle(fontSize: 28),
+                      ),
+                    ),
                   )
                 : Center(
-                    child: Text(monitor.badge,
-                        style: const TextStyle(fontSize: 28))),
+                    child: Text(
+                      monitor.badge,
+                      style: const TextStyle(fontSize: 28),
+                    ),
+                  ),
           ),
         ),
         const SizedBox(height: 6),

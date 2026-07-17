@@ -111,10 +111,12 @@ void main() {
 
   group('parkMonitorCountsProvider', () {
     test('returns park counts from repository', () async {
-      when(mockRepo.getParkMonitorCounts()).thenAnswer((_) async => {
-            'สวนลุมพินี': 5,
-            'สวนจตุจักร': 3,
-          });
+      when(mockRepo.getParkMonitorCounts()).thenAnswer(
+        (_) async => {
+          'สวนลุมพินี': 5,
+          'สวนจตุจักร': 3,
+        },
+      );
 
       final container = makeContainer();
       addTearDown(container.dispose);

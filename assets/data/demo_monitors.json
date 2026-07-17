@@ -14,12 +14,20 @@
     "personalityEn": "Calm, confident, and usually seen near the water.",
     "badge": "L",
     "rarity": "legendary",
-    "sightingStreak": 12,
     "lastSeenAt": "2026-05-24T08:30:00.000Z",
     "lastSeenBy": "demo-user",
     "photoGallery": [],
-    "tags": ["lakeside", "calm", "famous"],
-    "createdAt": "2026-03-25T10:00:00.000Z"
+    "tags": [
+      "lakeside",
+      "calm",
+      "famous"
+    ],
+    "createdAt": "2026-03-25T10:00:00.000Z",
+    "schemaVersion": 1,
+    "parkId": "lumpini",
+    "sightingCount": 12,
+    "moderationStatus": "approved",
+    "updatedAt": "2026-03-25T10:00:00.000Z"
   },
   {
     "id": "benjakitti-mango",
@@ -36,12 +44,20 @@
     "personalityEn": "Curious and quick, often crossing quiet paths.",
     "badge": "E",
     "rarity": "epic",
-    "sightingStreak": 7,
     "lastSeenAt": "2026-05-24T07:10:00.000Z",
     "lastSeenBy": "demo-user",
     "photoGallery": [],
-    "tags": ["wetland", "quick", "morning"],
-    "createdAt": "2026-04-02T11:00:00.000Z"
+    "tags": [
+      "wetland",
+      "quick",
+      "morning"
+    ],
+    "createdAt": "2026-04-02T11:00:00.000Z",
+    "schemaVersion": 1,
+    "parkId": "benjakitti",
+    "sightingCount": 7,
+    "moderationStatus": "approved",
+    "updatedAt": "2026-04-02T11:00:00.000Z"
   },
   {
     "id": "chatuchak-banana",
@@ -58,12 +74,20 @@
     "personalityEn": "Shy but photogenic when resting in the shade.",
     "badge": "R",
     "rarity": "rare",
-    "sightingStreak": 3,
     "lastSeenAt": "2026-05-23T16:45:00.000Z",
     "lastSeenBy": "demo-user",
     "photoGallery": [],
-    "tags": ["shade", "shy", "weekend"],
-    "createdAt": "2026-04-15T09:00:00.000Z"
+    "tags": [
+      "shade",
+      "shy",
+      "weekend"
+    ],
+    "createdAt": "2026-04-15T09:00:00.000Z",
+    "schemaVersion": 1,
+    "parkId": "chatuchak",
+    "sightingCount": 3,
+    "moderationStatus": "approved",
+    "updatedAt": "2026-04-15T09:00:00.000Z"
   },
   {
     "id": "rot-fai-noodle",
@@ -80,11 +104,19 @@
     "personalityEn": "Relaxed explorer that prefers quiet garden edges.",
     "badge": "C",
     "rarity": "common",
-    "sightingStreak": 2,
     "lastSeenAt": "2026-05-22T12:20:00.000Z",
     "lastSeenBy": "demo-user",
     "photoGallery": [],
-    "tags": ["garden", "quiet", "afternoon"],
-    "createdAt": "2026-04-21T14:00:00.000Z"
+    "tags": [
+      "garden",
+      "quiet",
+      "afternoon"
+    ],
+    "createdAt": "2026-04-21T14:00:00.000Z",
+    "schemaVersion": 1,
+    "parkId": "wachirabenchathat",
+    "sightingCount": 2,
+    "moderationStatus": "approved",
+    "updatedAt": "2026-04-21T14:00:00.000Z"
   }
 ]

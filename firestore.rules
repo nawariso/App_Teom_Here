@@ -2,53 +2,285 @@ rules_version = '2';
 
 service cloud.firestore {
   match /databases/{database}/documents {
-
-    // ─── Helper Functions ───
-    function isAuthenticated() {
+    function isSignedIn() {
       return request.auth != null;
     }
 
     function isOwner(userId) {
-      return request.auth.uid == userId;
+      return isSignedIn() && request.auth.uid == userId;
     }
 
-    // ─── Monitors ───
-    match /monitors/{monitorId} {
-      // Anyone can read monitors
+    function hasOnlyFields(fields) {
+      return request.resource.data.keys().hasOnly(fields);
+    }
+
+    function hasRequiredFields(fields) {
+      return request.resource.data.keys().hasAll(fields);
+    }
+
+    function isStringOrNull(value) {
+      return value == null || value is string;
+    }
+
+    function isValidDisplayName() {
+      return request.resource.data.displayName is string
+        && request.resource.data.displayName.size() >= 1
+        && request.resource.data.displayName.size() <= 60;
+    }
+
+    function isValidOptionalUrl(value) {
+      return value == null || (value is string && value.size() <= 2048);
+    }
+
+    function isValidStringList(value, maxSize) {
+      return value is list && value.size() <= maxSize;
+    }
+
+    function isValidUserProfileCreate(userId) {
+      return isOwner(userId)
+        && hasOnlyFields([
+          'schemaVersion',
+          'displayName',
+          'photoUrl',
+          'level',
+          'totalCollected',
+          'totalSightings',
+          'parksVisited',
+          'xp',
+          'achievementIds',
+          'favoriteMonitorIds',
+          'collectedMonitorIds',
+          'createdAt',
+          'updatedAt'
+        ])
+        && hasRequiredFields([
+          'schemaVersion',
+          'displayName',
+          'level',
+          'totalCollected',
+          'totalSightings',
+          'parksVisited',
+          'xp',
+          'achievementIds',
+          'favoriteMonitorIds',
+          'collectedMonitorIds',
+          'createdAt',
+          'updatedAt'
+        ])
+        && request.resource.data.schemaVersion == 1
+        && isValidDisplayName()
+        && isValidOptionalUrl(request.resource.data.get('photoUrl', null))
+        && request.resource.data.level == 1
+        && request.resource.data.totalCollected == 0
+        && request.resource.data.totalSightings == 0
+        && request.resource.data.parksVisited == 0
+        && request.resource.data.xp == 0
+        && isValidStringList(request.resource.data.achievementIds, 0)
+        && isValidStringList(request.resource.data.favoriteMonitorIds, 0)
+        && isValidStringList(request.resource.data.collectedMonitorIds, 0)
+        && request.resource.data.createdAt == request.time
+        && request.resource.data.updatedAt == request.time;
+    }
+
+    function isApprovedMonitor(monitorId) {
+      return exists(/databases/$(database)/documents/monitors/$(monitorId))
+        && get(/databases/$(database)/documents/monitors/$(monitorId)).data.moderationStatus == 'approved';
+    }
+
+    function isActivePark(parkId) {
+      return exists(/databases/$(database)/documents/parks/$(parkId))
+        && get(/databases/$(database)/documents/parks/$(parkId)).data.active == true;
+    }
+
+    function isValidSightingPhotoUrl(data, sightingId) {
+      return data.photoUrl is string
+        && data.photoUrl.size() <= 2048
+        && data.photoUrl.matches(
+          '^https://firebasestorage[.]googleapis[.]com/v0/b/[^/?]+/o/sightings%2F'
+            + request.auth.uid + '%2F' + sightingId
+            + '%2Fphoto[.]jpg[?]alt=media(&token=[A-Za-z0-9_-]+)?$'
+        );
+    }
+
+    function isValidMonitorReference(data) {
+      return (
+          data.submittedAsUnknown == true
+          && data.get('monitorId', null) == null
+        ) || (
+          data.submittedAsUnknown == false
+          && data.monitorId is string
+          && data.monitorId.size() >= 1
+          && data.monitorId.size() <= 128
+          && isApprovedMonitor(data.monitorId)
+        );
+    }
+
+    function isValidSightingCreate(sightingId) {
+      let data = request.resource.data;
+      return isSignedIn()
+        && hasOnlyFields([
+          'schemaVersion',
+          'monitorId',
+          'submittedAsUnknown',
+          'userId',
+          'photoUrl',
+          'storagePath',
+          'latitude',
+          'longitude',
+          'parkId',
+          'parkName',
+          'notes',
+          'moderationStatus',
+          'rejectionReason',
+          'spottedAt',
+          'createdAt',
+          'updatedAt'
+        ])
+        && hasRequiredFields([
+          'schemaVersion',
+          'submittedAsUnknown',
+          'userId',
+          'photoUrl',
+          'storagePath',
+          'latitude',
+          'longitude',
+          'parkId',
+          'parkName',
+          'moderationStatus',
+          'spottedAt',
+          'createdAt',
+          'updatedAt'
+        ])
+        && data.schemaVersion == 1
+        && data.userId == request.auth.uid
+        && data.submittedAsUnknown is bool
+        && isValidMonitorReference(data)
+        && isValidSightingPhotoUrl(data, sightingId)
+        && data.storagePath == 'sightings/' + request.auth.uid + '/' + sightingId + '/photo.jpg'
+        && data.latitude is number
+        && data.latitude >= -90
+        && data.latitude <= 90
+        && data.longitude is number
+        && data.longitude >= -180
+        && data.longitude <= 180
+        && data.parkId is string
+        && data.parkId.size() >= 1
+        && data.parkId.size() <= 80
+        && data.parkId.matches('^[a-z0-9]+(-[a-z0-9]+)*$')
+        && isActivePark(data.parkId)
+        && data.parkName == get(/databases/$(database)/documents/parks/$(data.parkId)).data.name
+        && isStringOrNull(data.get('notes', null))
+        && (data.get('notes', null) == null || data.notes.size() <= 500)
+        && data.moderationStatus == 'pending'
+        && data.get('rejectionReason', null) == null
+        && data.spottedAt is timestamp
+        && data.spottedAt <= request.time
+        && data.spottedAt >= request.time - duration.value(30, 'd')
+        && data.createdAt == request.time
+        && data.updatedAt == request.time;
+    }
+
+    function isValidVoteCreate(monitorId, userId) {
+      return isOwner(userId)
+        && isApprovedMonitor(monitorId)
+        && hasOnlyFields(['votedAt'])
+        && request.resource.data.votedAt == request.time;
+    }
+
+    function isValidReportCreate() {
+      let data = request.resource.data;
+      return isSignedIn()
+        && hasOnlyFields([
+          'targetType',
+          'targetId',
+          'userId',
+          'reason',
+          'details',
+          'status',
+          'createdAt'
+        ])
+        && hasRequiredFields([
+          'targetType',
+          'targetId',
+          'userId',
+          'reason',
+          'status',
+          'createdAt'
+        ])
+        && data.userId == request.auth.uid
+        && data.targetType in ['monitor', 'sighting', 'user']
+        && data.targetId is string
+        && data.targetId.size() >= 1
+        && data.targetId.size() <= 128
+        && data.reason is string
+        && data.reason.size() >= 1
+        && data.reason.size() <= 80
+        && isStringOrNull(data.get('details', null))
+        && (data.get('details', null) == null || data.details.size() <= 1000)
+        && data.status == 'open'
+        && data.createdAt == request.time;
+    }
+
+    match /users/{userId} {
       allow read: if true;
-
-      // Only authenticated users can create
-      allow create: if isAuthenticated();
-
-      // Only allow updating votes and lastSeen fields
-      allow update: if isAuthenticated()
-        && request.resource.data.diff(resource.data).affectedKeys()
-            .hasOnly(['votes', 'lastSeenAt', 'lastSeenBy', 'latitude',
-                       'longitude', 'photoGallery', 'sightingStreak']);
-
+      allow create: if isValidUserProfileCreate(userId);
+      allow update: if isOwner(userId)
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly([
+          'displayName',
+          'photoUrl',
+          'updatedAt'
+        ])
+        && isValidDisplayName()
+        && isValidOptionalUrl(request.resource.data.get('photoUrl', null))
+        && request.resource.data.updatedAt == request.time;
       allow delete: if false;
 
-      // Voters subcollection
-      match /voters/{userId} {
-        allow read: if isAuthenticated();
-        allow create, delete: if isAuthenticated() && isOwner(userId);
+      match /approvedSightings/{sightingId} {
+        allow read: if isOwner(userId);
+        allow create, update, delete: if false;
       }
     }
 
-    // ─── Sightings ───
+    match /monitors/{monitorId} {
+      allow read: if resource.data.moderationStatus == 'approved';
+      allow create, update, delete: if false;
+
+      match /voters/{userId} {
+        allow read: if isSignedIn();
+        allow create: if isValidVoteCreate(monitorId, userId);
+        allow delete: if isOwner(userId) && isApprovedMonitor(monitorId);
+        allow update: if false;
+      }
+    }
+
     match /sightings/{sightingId} {
-      allow read: if true;
-      allow create: if isAuthenticated()
-        && request.resource.data.userId == request.auth.uid;
+      allow read: if resource.data.moderationStatus == 'approved'
+        || isOwner(resource.data.userId);
+      allow create: if isValidSightingCreate(sightingId);
       allow update, delete: if false;
     }
 
-    // ─── Users ───
-    match /users/{userId} {
-      allow read: if true;
-      allow create: if isAuthenticated() && isOwner(userId);
-      allow update: if isAuthenticated() && isOwner(userId);
-      allow delete: if false;
+    match /parks/{parkId} {
+      allow read: if resource.data.active == true;
+      allow create, update, delete: if false;
+    }
+
+    match /reports/{reportId} {
+      allow read: if false;
+      allow create: if isValidReportCreate();
+      allow update, delete: if false;
+    }
+
+    match /moderationQueue/{sightingId} {
+      allow read, write: if false;
+    }
+
+    match /functionEvents/{eventId} {
+      allow read, write: if false;
+    }
+
+    match /{document=**} {
+      allow read, write: if false;
     }
   }
 }

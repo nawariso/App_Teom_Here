@@ -3,32 +3,32 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../data/monitor_repository.dart';
 import '../../domain/models/monitor.dart';
 
-// ─── Monitors ranked by votes ───
+// Monitors ranked by votes.
 final monitorsRankedProvider = StreamProvider<List<Monitor>>((ref) {
   final repo = ref.watch(monitorRepositoryProvider);
   return repo.watchMonitorsByVotes();
 });
 
-// ─── Single monitor detail ───
+// Single monitor detail.
 final monitorDetailProvider =
     FutureProvider.family<Monitor?, String>((ref, id) async {
   final repo = ref.watch(monitorRepositoryProvider);
   return repo.getMonitor(id);
 });
 
-// ─── Recent sightings ───
+// Recent sightings.
 final recentSightingsProvider = StreamProvider<List<MonitorSighting>>((ref) {
   final repo = ref.watch(monitorRepositoryProvider);
   return repo.watchRecentSightings();
 });
 
-// ─── Park monitor counts (for map) ───
+// Park monitor counts for the map.
 final parkMonitorCountsProvider = FutureProvider<Map<String, int>>((ref) async {
   final repo = ref.watch(monitorRepositoryProvider);
   return repo.getParkMonitorCounts();
 });
 
-// ─── Vote state ───
+// Vote state for a monitor/user pair.
 final hasVotedProvider =
     FutureProvider.family<bool, ({String monitorId, String userId})>(
         (ref, params) async {
@@ -36,7 +36,6 @@ final hasVotedProvider =
   return repo.hasVoted(params.monitorId, params.userId);
 });
 
-// ─── Ranking filter ───
 enum RankingFilter { allTime, weekly, newest }
 
 final rankingFilterProvider = StateProvider<RankingFilter>((ref) {

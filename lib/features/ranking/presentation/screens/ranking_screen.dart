@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../../core/router/app_routes.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../home/presentation/widgets/ranking_preview.dart';
 import '../../../monitor/presentation/providers/monitor_providers.dart';
@@ -36,7 +37,9 @@ class RankingScreen extends ConsumerWidget {
                 child: RankingPreviewCard(
                   monitor: monitor,
                   rank: index + 1,
-                  onTap: () => context.push('/monitor/${monitor.id}'),
+                  onTap: () => context.push(
+                    AppRoutes.monitorDetailPath(monitor.id),
+                  ),
                 ),
               );
             },

@@ -1,0 +1,84 @@
+rules_version = '2';
+
+service firebase.storage {
+  match /b/{bucket}/o {
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    function isImage() {
+      return request.resource.contentType.matches('image/.*');
+    }
+
+    function isSmallEnough() {
+      return request.resource.size < 5 * 1024 * 1024;
+    }
+
+    function hasUploadMetadata(userId, sightingId) {
+      return request.resource.metadata.ownerId == userId
+        && request.resource.metadata.sightingId == sightingId;
+    }
+
+    function hasStoredMetadata(userId, sightingId) {
+      return resource.metadata.ownerId == userId
+        && resource.metadata.sightingId == sightingId;
+    }
+
+    function isApprovedSighting(userId, sightingId) {
+      let sightingPath = /databases/(default)/documents/sightings/$(sightingId);
+      return firestore.exists(sightingPath)
+        ? firestore.get(sightingPath).data.moderationStatus == 'approved'
+          && firestore.get(sightingPath).data.userId == userId
+          && firestore.get(sightingPath).data.storagePath
+            == 'sightings/' + userId + '/' + sightingId + '/photo.jpg'
+        : false;
+    }
+
+    function canCleanUpSighting(sightingId) {
+      let sightingPath = /databases/(default)/documents/sightings/$(sightingId);
+      return firestore.exists(sightingPath)
+        ? firestore.get(sightingPath).data.moderationStatus != 'approved'
+        : true;
+    }
+
+    match /sightings/{userId}/{sightingId}/photo.jpg {
+      allow read: if isOwner(userId)
+        || isApprovedSighting(userId, sightingId);
+      allow create: if isOwner(userId)
+        && isImage()
+        && isSmallEnough()
+        && hasUploadMetadata(userId, sightingId);
+      allow delete: if isOwner(userId)
+        && hasStoredMetadata(userId, sightingId)
+        && canCleanUpSighting(sightingId);
+      allow update: if false;
+    }
+
+    match /users/{userId}/profile.jpg {
+      allow read: if true;
+      allow create: if isOwner(userId)
+        && isImage()
+        && isSmallEnough()
+        && request.resource.metadata.ownerId == userId;
+      allow update: if isOwner(userId)
+        && isImage()
+        && isSmallEnough()
+        && request.resource.metadata.ownerId == userId;
+      allow delete: if isOwner(userId)
+        && resource.metadata.ownerId == userId;
+    }
+
+    match /monitors/{monitorId}/{allPaths=**} {
+      allow read: if true;
+      allow write: if false;
+    }
+
+    match /{allPaths=**} {
+      allow read, write: if false;
+    }
+  }
+}

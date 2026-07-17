@@ -1,19 +1,20 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+
 import '../../../../core/theme/app_theme.dart';
 import '../../../monitor/domain/models/monitor.dart';
 
 class RankingPreviewCard extends StatelessWidget {
-  final Monitor monitor;
-  final int rank;
-  final VoidCallback onTap;
-
   const RankingPreviewCard({
     super.key,
     required this.monitor,
     required this.rank,
     required this.onTap,
   });
+
+  final Monitor monitor;
+  final int rank;
+  final VoidCallback onTap;
 
   Color get _rankColor {
     if (rank == 1) return AppColors.gold;
@@ -36,18 +37,18 @@ class RankingPreviewCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
+    return InkWell(
       onTap: onTap,
+      borderRadius: BorderRadius.circular(16),
       child: Container(
         padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(
           color: AppColors.bgCard,
           borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: Colors.white.withOpacity(0.06)),
+          border: Border.all(color: Colors.white.withValues(alpha: 0.06)),
         ),
         child: Row(
           children: [
-            // Rank badge
             SizedBox(
               width: 32,
               child: Text(
@@ -62,7 +63,6 @@ class RankingPreviewCard extends StatelessWidget {
               ),
             ),
             const SizedBox(width: 10),
-            // Photo
             ClipRRect(
               borderRadius: BorderRadius.circular(10),
               child: monitor.photoUrl != null
@@ -72,15 +72,20 @@ class RankingPreviewCard extends StatelessWidget {
                       height: 52,
                       fit: BoxFit.cover,
                       placeholder: (_, __) => _PhotoPlaceholder(
-                          badge: monitor.badge, color: _rarityColor),
+                        badge: monitor.badge,
+                        color: _rarityColor,
+                      ),
                       errorWidget: (_, __, ___) => _PhotoPlaceholder(
-                          badge: monitor.badge, color: _rarityColor),
+                        badge: monitor.badge,
+                        color: _rarityColor,
+                      ),
                     )
                   : _PhotoPlaceholder(
-                      badge: monitor.badge, color: _rarityColor),
+                      badge: monitor.badge,
+                      color: _rarityColor,
+                    ),
             ),
             const SizedBox(width: 12),
-            // Info
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -101,7 +106,7 @@ class RankingPreviewCard extends StatelessWidget {
                     style: const TextStyle(
                       color: AppColors.textMuted,
                       fontSize: 11,
-                      fontFamily: 'NotoSansThai',
+                      fontFamily: 'Fredoka',
                     ),
                     overflow: TextOverflow.ellipsis,
                   ),
@@ -110,7 +115,7 @@ class RankingPreviewCard extends StatelessWidget {
                     padding:
                         const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                     decoration: BoxDecoration(
-                      color: _rarityColor.withOpacity(0.15),
+                      color: _rarityColor.withValues(alpha: 0.15),
                       borderRadius: BorderRadius.circular(6),
                     ),
                     child: Text(
@@ -126,12 +131,14 @@ class RankingPreviewCard extends StatelessWidget {
                 ],
               ),
             ),
-            // Votes
             Column(
               crossAxisAlignment: CrossAxisAlignment.end,
               children: [
-                const Text('♥',
-                    style: TextStyle(color: AppColors.heart, fontSize: 14)),
+                const Icon(
+                  Icons.favorite_rounded,
+                  color: AppColors.heart,
+                  size: 14,
+                ),
                 Text(
                   '${monitor.votes}',
                   style: const TextStyle(
@@ -151,10 +158,10 @@ class RankingPreviewCard extends StatelessWidget {
 }
 
 class _PhotoPlaceholder extends StatelessWidget {
+  const _PhotoPlaceholder({required this.badge, required this.color});
+
   final String badge;
   final Color color;
-
-  const _PhotoPlaceholder({required this.badge, required this.color});
 
   @override
   Widget build(BuildContext context) {
@@ -162,7 +169,7 @@ class _PhotoPlaceholder extends StatelessWidget {
       width: 52,
       height: 52,
       decoration: BoxDecoration(
-        color: color.withOpacity(0.12),
+        color: color.withValues(alpha: 0.12),
         borderRadius: BorderRadius.circular(10),
       ),
       child: Center(

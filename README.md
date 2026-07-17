@@ -10,7 +10,7 @@ Working baseline:
 
 - Flutter project scaffold is restored for Android, iOS, web, Windows, macOS, and Linux.
 - Web build works from an ASCII-only local path.
-- Firebase startup is tolerant of missing local config so the app can render in demo/development mode.
+- Runtime environment selection is explicit. Demo mode never initializes Firebase; development and production fail closed when configuration is missing or mismatched.
 - Demo monitor and sighting data is bundled under `assets/data/`.
 - Project operating documents live under `docs/`.
 
@@ -20,7 +20,8 @@ Known limitations:
 - Demo mode is read-only. Creating monitors, reporting sightings, and real voting still require Firebase setup.
 - Thai and emoji text in older source files is corrupted and needs cleanup.
 - Custom font files are not committed yet; `pubspec.yaml` no longer declares missing fonts.
-- `flutter analyze` still reports lint/style warnings. The current priority was to get the app runnable first.
+- Production Firebase, release signing, App Check, and final privacy hardening
+  are intentionally not enabled yet; the checked-in foundation fails closed.
 
 ## Recommended Local Path
 
@@ -62,7 +63,7 @@ dart run build_runner build --delete-conflicting-outputs
 ### Web Server
 
 ```powershell
-flutter run -d web-server --web-hostname localhost --web-port 52345
+flutter run -d web-server --web-hostname localhost --web-port 52345 --dart-define=APP_ENV=demo
 ```
 
 Open:
@@ -74,13 +75,13 @@ http://localhost:52345
 ### Chrome
 
 ```powershell
-flutter run -d chrome
+flutter run -d chrome --dart-define=APP_ENV=demo
 ```
 
 ### Windows Desktop
 
 ```powershell
-flutter run -d windows
+flutter run -d windows --dart-define=APP_ENV=demo
 ```
 
 ## Verify
@@ -96,12 +97,17 @@ flutter test
 ## Project Docs
 
 - Team roles: `docs/team/roles.md`
+- Agent workspace: `docs/agents/README.md`
+- Agent roster: `docs/agents/agent-roster.md`
+- Agent task routing: `docs/agents/task-routing.md`
 - Product vision: `docs/product/vision.md`
 - MVP scope: `docs/product/mvp-scope.md`
+- Production launch plan: `docs/product/production-launch-plan.md`
 - User stories: `docs/product/user-stories.md`
 - Future feature ideas: `docs/product/future-features.md`
 - Architecture overview: `docs/architecture/overview.md`
 - Data model: `docs/architecture/data-model.md`
+- Production Firebase plan: `docs/architecture/production-firebase-plan.md`
 - Infrastructure setup: `docs/infra/setup.md`
 - QA test plan: `docs/qa/test-plan.md`
 - UX/UI guidelines: `docs/design/ux-ui-guidelines.md`
@@ -176,16 +182,14 @@ chore: restore runnable Flutter scaffold
 
 ## Next Milestone
 
-Milestone 0 is project health:
+The next production milestone is the report sighting flow.
 
-- Clean corrupted Thai/emoji text.
-- Reduce analyze warnings.
-- Decide which generated files should be committed or generated in CI only.
-- Configure real Firebase web, Android, and iOS options.
-- Replace placeholder app ids/package names from `flutter create`.
+Build in this order:
 
-After that, move to the MVP read-only app:
+1. Configure Firebase dev and production projects.
+2. Deploy and test Firestore and Storage rules.
+3. Deploy and test Cloud Functions for moderation, vote counters, and monitor last-seen updates.
+4. Build the report sighting flow.
+5. Connect home, ranking, map, and profile to production data.
 
-- Monitor detail renders from demo data.
-- Map shows park placeholders.
-- Profile shows basic collection progress.
+See `docs/product/production-launch-plan.md` for the full launch roadmap.

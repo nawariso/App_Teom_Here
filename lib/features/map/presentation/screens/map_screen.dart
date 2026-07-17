@@ -1,8 +1,8 @@
-import "package:flutter/material.dart";
+import 'package:flutter/material.dart';
 
 class MapScreen extends StatelessWidget {
   const MapScreen({super.key});
   @override
   Widget build(BuildContext context) =>
-      const Scaffold(body: Center(child: Text("Map")));
+      const Scaffold(body: Center(child: Text('Map')));
 }

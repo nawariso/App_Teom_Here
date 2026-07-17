@@ -81,6 +81,18 @@ coverage/
 *.lcov
 flutter_run*.log
 
+# Local agent tooling and worktrees
+.agents/
+.hermes/
+.claude/worktrees/
+
+# JavaScript dependencies and Firebase local logs
+**/node_modules/
+firebase-debug.log
+firebase-debug.*.log
+firestore-debug.log
+ui-debug.log
+
 # Secrets & Environment
 .env
 .env.*
@@ -92,7 +104,6 @@ flutter_run*.log
 # Firebase
 google-services.json
 GoogleService-Info.plist
-firebase_options.dart
 
 # Fastlane
 **/fastlane/report.xml

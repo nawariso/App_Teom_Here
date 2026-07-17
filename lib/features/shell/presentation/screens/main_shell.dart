@@ -1,36 +1,37 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../../core/router/app_routes.dart';
 import '../../../../core/theme/app_theme.dart';
 
-class MainShell extends StatelessWidget {
-  final Widget child;
+enum _ShellTab {
+  home(AppRoutes.home, Icons.home_rounded, 'Home'),
+  map(AppRoutes.map, Icons.map_rounded, 'Map'),
+  camera(AppRoutes.camera, Icons.camera_alt_rounded, 'Camera'),
+  ranking(AppRoutes.ranking, Icons.emoji_events_rounded, 'Rank'),
+  profile(AppRoutes.profile, Icons.person_rounded, 'Me');
 
+  const _ShellTab(this.path, this.icon, this.label);
+
+  final String path;
+  final IconData icon;
+  final String label;
+}
+
+class MainShell extends StatelessWidget {
   const MainShell({super.key, required this.child});
+  final Widget child;
 
   int _currentIndex(BuildContext context) {
     final location = GoRouterState.of(context).uri.toString();
-    if (location.startsWith('/home')) return 0;
-    if (location.startsWith('/map')) return 1;
-    if (location.startsWith('/camera')) return 2;
-    if (location.startsWith('/ranking')) return 3;
-    if (location.startsWith('/profile')) return 4;
-    return 0;
+    final index = _ShellTab.values.indexWhere(
+      (tab) => location.startsWith(tab.path),
+    );
+    return index == -1 ? _ShellTab.home.index : index;
   }
 
   void _onTap(BuildContext context, int index) {
-    switch (index) {
-      case 0:
-        context.go('/home');
-      case 1:
-        context.go('/map');
-      case 2:
-        context.go('/camera');
-      case 3:
-        context.go('/ranking');
-      case 4:
-        context.go('/profile');
-    }
+    context.go(_ShellTab.values[index].path);
   }
 
   @override
@@ -40,12 +41,12 @@ class MainShell extends StatelessWidget {
     return Scaffold(
       body: child,
       extendBody: true,
-      bottomNavigationBar: Container(
+      bottomNavigationBar: DecoratedBox(
         decoration: BoxDecoration(
-          color: AppColors.bgDark.withOpacity(0.95),
+          color: AppColors.bgDark.withValues(alpha: 0.95),
           border: Border(
             top: BorderSide(
-              color: Colors.white.withOpacity(0.08),
+              color: Colors.white.withValues(alpha: 0.08),
             ),
           ),
         ),
@@ -56,32 +57,32 @@ class MainShell extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
                 _NavItem(
-                  icon: Icons.home_rounded,
-                  label: 'Home',
-                  isActive: currentIndex == 0,
-                  onTap: () => _onTap(context, 0),
+                  icon: _ShellTab.home.icon,
+                  label: _ShellTab.home.label,
+                  isActive: currentIndex == _ShellTab.home.index,
+                  onTap: () => _onTap(context, _ShellTab.home.index),
                 ),
                 _NavItem(
-                  icon: Icons.map_rounded,
-                  label: 'Map',
-                  isActive: currentIndex == 1,
-                  onTap: () => _onTap(context, 1),
+                  icon: _ShellTab.map.icon,
+                  label: _ShellTab.map.label,
+                  isActive: currentIndex == _ShellTab.map.index,
+                  onTap: () => _onTap(context, _ShellTab.map.index),
                 ),
                 _CameraNavItem(
-                  isActive: currentIndex == 2,
-                  onTap: () => _onTap(context, 2),
+                  isActive: currentIndex == _ShellTab.camera.index,
+                  onTap: () => _onTap(context, _ShellTab.camera.index),
                 ),
                 _NavItem(
-                  icon: Icons.emoji_events_rounded,
-                  label: 'Rank',
-                  isActive: currentIndex == 3,
-                  onTap: () => _onTap(context, 3),
+                  icon: _ShellTab.ranking.icon,
+                  label: _ShellTab.ranking.label,
+                  isActive: currentIndex == _ShellTab.ranking.index,
+                  onTap: () => _onTap(context, _ShellTab.ranking.index),
                 ),
                 _NavItem(
-                  icon: Icons.person_rounded,
-                  label: 'Me',
-                  isActive: currentIndex == 4,
-                  onTap: () => _onTap(context, 4),
+                  icon: _ShellTab.profile.icon,
+                  label: _ShellTab.profile.label,
+                  isActive: currentIndex == _ShellTab.profile.index,
+                  onTap: () => _onTap(context, _ShellTab.profile.index),
                 ),
               ],
             ),
@@ -93,17 +94,16 @@ class MainShell extends StatelessWidget {
 }
 
 class _NavItem extends StatelessWidget {
-  final IconData icon;
-  final String label;
-  final bool isActive;
-  final VoidCallback onTap;
-
   const _NavItem({
     required this.icon,
     required this.label,
     required this.isActive,
     required this.onTap,
   });
+  final IconData icon;
+  final String label;
+  final bool isActive;
+  final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
@@ -137,13 +137,12 @@ class _NavItem extends StatelessWidget {
 }
 
 class _CameraNavItem extends StatelessWidget {
-  final bool isActive;
-  final VoidCallback onTap;
-
   const _CameraNavItem({
     required this.isActive,
     required this.onTap,
   });
+  final bool isActive;
+  final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
@@ -163,7 +162,7 @@ class _CameraNavItem extends StatelessWidget {
             ),
             boxShadow: [
               BoxShadow(
-                color: AppColors.primary.withOpacity(0.4),
+                color: AppColors.primary.withValues(alpha: 0.4),
                 blurRadius: 20,
                 offset: const Offset(0, 4),
               ),
