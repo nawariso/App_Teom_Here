@@ -35,7 +35,7 @@ dependencies:
   geocoding: ^3.0.0
 
   # ML / AI Detection
-  google_mlkit_object_detection: ^0.13.0
+  google_mlkit_object_detection: ^0.15.1
   tflite_flutter: ^0.11.0
 
   # Local Storage
